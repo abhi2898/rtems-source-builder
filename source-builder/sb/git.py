@@ -38,9 +38,12 @@ class repo:
         if ec:
             raise error.general('git command failed (%s): %d' % (self.git, ec))
 
+    def _valid_repo_path(self):
+    	return path.exists(path.join(self.path, '.git'))
+
     def _run(self, args, check = False):
         e = execute.capture_execution()
-        if path.exists(self.path):
+        if _valid_repo_path():
             cwd = self.path
         else:
             cwd = None
@@ -122,7 +125,7 @@ class repo:
 
     def status(self, submodules_always_clean = False):
         _status = {}
-        if path.exists(self.path):
+        if _valid_repo_path():
             if submodules_always_clean:
                 submodules = self.submodules()
             else:
@@ -166,7 +169,7 @@ class repo:
         return not (len(_status) == 1 and 'branch' in _status)
 
     def valid(self):
-        if path.exists(self.path):
+        if _valid_repo_path():
             ec, output = self._run(['status'])
             return ec == 0
         return False
